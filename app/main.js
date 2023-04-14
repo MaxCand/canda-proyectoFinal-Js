@@ -1,59 +1,59 @@
-//Traer datos de JSON
+//CONSUMIR DATOS DESDE JSON LOCAL
 
-const url = "./Json/productos.json"
+const url = "./Json/productos.json";
 
 fetch(url)
-.then(respuesta => respuesta.json())
-.then(data => mostrarProductos(data))
+  .then((respuesta) => respuesta.json())
+  .then((data) => mostrarProductos(data));
 
+//INICIALIZAR CARRITO
 
-let carrito = []
+let carrito = [];
 
-if (localStorage.getItem("carrito")){
-  carrito = JSON.parse(localStorage.getItem("carrito"))
+//LOCALSTORAGE
+
+if (localStorage.getItem("carrito")) {
+  carrito = JSON.parse(localStorage.getItem("carrito"));
 }
 
-document.addEventListener("DOMContentLoaded", ()=>{
-  if (localStorage.getItem("carrito")){
-    carrito = JSON.parse(localStorage.getItem("carrito"))
-    mostrarCarrito()
+document.addEventListener("DOMContentLoaded", () => {
+  if (localStorage.getItem("carrito")) {
+    carrito = JSON.parse(localStorage.getItem("carrito"));
+    mostrarCarrito();
   }
-})
+});
 
+//CONSTANTES VINCULADAS AL INDEX
 
-//Constantes index 
+const contenedorProductos = document.getElementById("contenedorProductos");
 
-const contenedorProductos = document.getElementById("contenedorProductos")
+const verCarrito = document.getElementById("verCarrito");
 
-const verCarrito = document.getElementById("verCarrito")
+verCarrito.addEventListener("click", () => {
+  mostrarCarrito();
+});
 
-verCarrito.addEventListener("click", ()=>{
-  mostrarCarrito()
-})
+const contadorCarrito = document.getElementById("contadorCarrito");
 
-const contadorCarrito = document.getElementById("contadorCarrito")
+const vaciarCarrito = document.getElementById("vaciarCarrito");
 
-const vaciarCarrito = document.getElementById("vaciarCarrito")
+const total = document.getElementById("total");
 
-const total = document.getElementById("total")
+const cuerpoCarrito = document.getElementById("cuerpoCarrito");
 
-const cuerpoCarrito = document.getElementById("cuerpoCarrito")
+const finalizarCompra = document.getElementById("finalizarCompra");
 
-const finalizarCompra = document.getElementById("finalizarCompra")
+finalizarCompra.addEventListener("click", finalizarCompraa);
 
-finalizarCompra.addEventListener("click", finalizarCompraa)
-
-vaciarCarrito.addEventListener("click", limpiarCarrito)
-
+vaciarCarrito.addEventListener("click", limpiarCarrito);
 
 //FUNCIONES
 
-
-//Mostrar juegos en el dom
-function mostrarProductos (data){
-  data.forEach((juego) =>{
-    const div = document.createElement("div")
-    div.classList.add("col-xl-3", "col-md-6", "col-xs-12")
+//MOSTRAR JUEGOS EN DOM
+function mostrarProductos(data) {
+  data.forEach((juego) => {
+    const div = document.createElement("div");
+    div.classList.add("col-xl-3", "col-md-6", "col-xs-12");
     div.innerHTML = `
     
     <div class="card" style="width: 20rem;">
@@ -66,47 +66,45 @@ function mostrarProductos (data){
     <button class="btn colorBoton" id="boton${juego.id}">Agregar al carrito</button>
     </div>
     </div>
-    `
-    contenedorProductos.appendChild(div)
-    
-    const boton = document.getElementById(`boton${juego.id}`)
-    boton.addEventListener("click", ()=>{
-      agregarAlCarrito(juego.id, data)
-    })
-    
-  })
+    `;
+    contenedorProductos.appendChild(div);
+
+    const boton = document.getElementById(`boton${juego.id}`);
+    boton.addEventListener("click", () => {
+      agregarAlCarrito(juego.id, data);
+    });
+  });
 }
 
-//Agregar juegos al carrito
+//AGREGAR AL CARRITO
 
-function agregarAlCarrito(id, array){
-  const juego = array.find((juego) => juego.id === id)
-  const juegoEnCarrito = carrito.find((juego) => juego.id === id)
-  
-  if(juegoEnCarrito){
-    juegoEnCarrito.cantidad++
-    localStorage.setItem("carrito", JSON.stringify(carrito))
+function agregarAlCarrito(id, array) {
+  const juego = array.find((juego) => juego.id === id);
+  const juegoEnCarrito = carrito.find((juego) => juego.id === id);
+
+  if (juegoEnCarrito) {
+    juegoEnCarrito.cantidad++;
+    localStorage.setItem("carrito", JSON.stringify(carrito));
   } else {
-    carrito.push(juego)
-    localStorage.setItem("carrito", JSON.stringify(carrito))
+    carrito.push(juego);
+    localStorage.setItem("carrito", JSON.stringify(carrito));
   }
-  console.log(carrito)
+  console.log(carrito);
   Swal.fire(
     `${juego.nombre} agregado al carrito!`,
-    'Que lo disfrutes!',
-    'success'
-    )
-    mostrarCarrito()
-  }
-  
-  
-  //Mostrar carrito
-  function mostrarCarrito(){
-    cuerpoCarrito.innerHTML = ``
-    carrito.forEach((juego) => {
-      const div = document.createElement("div")
-      div.className = ("productoEnCarrito ")
-      div.innerHTML = `
+    "Que lo disfrutes!",
+    "success"
+  );
+  mostrarCarrito();
+}
+
+//MOSTRAR CARRITO
+function mostrarCarrito() {
+  cuerpoCarrito.innerHTML = ``;
+  carrito.forEach((juego) => {
+    const div = document.createElement("div");
+    div.className = "productoEnCarrito ";
+    div.innerHTML = `
       
       <img src="${juego.img}" class="imgCarrito" alt="${juego.nombre}">
       <span class="span-carrito">
@@ -119,157 +117,140 @@ function agregarAlCarrito(id, array){
       </div>
       
       
-      `
-      cuerpoCarrito.appendChild(div)
-      const boton = document.getElementById(`eliminar${juego.id}`)
-      boton.addEventListener("click", ()=>{
-        eliminarDelCarrito(juego.id)
-      })
-      const decrementador = document.getElementById(`decrementador${juego.id}`)
-      decrementador.addEventListener("click", ()=>{
-        decrementar(juego.id)
-      })
-      const incrementador = document.getElementById(`incrementador${juego.id}`)
-      incrementador.addEventListener("click", ()=>{
-        incrementar(juego.id)
-      })
-      contadorCarrito.innerText = carrito.length
-    })
-    calcularTotal()
-  }
+      `;
+    cuerpoCarrito.appendChild(div);
+    const boton = document.getElementById(`eliminar${juego.id}`);
+    boton.addEventListener("click", () => {
+      eliminarDelCarrito(juego.id);
+    });
+    const decrementador = document.getElementById(`decrementador${juego.id}`);
+    decrementador.addEventListener("click", () => {
+      decrementar(juego.id);
+    });
+    const incrementador = document.getElementById(`incrementador${juego.id}`);
+    incrementador.addEventListener("click", () => {
+      incrementar(juego.id);
+    });
+    contadorCarrito.innerText = carrito.length;
+  });
+  calcularTotal();
+}
 
-//Incrementar en carrito
+//INCREMENTAR CANTIDAD DE PRODUCTO EN CARRITO
 
-function incrementar (id){
-  const juegoEnCarrito = carrito.find((juego) => juego.id === id)
-  juegoEnCarrito.cantidad++
-  localStorage.setItem("carrito", JSON.stringify(carrito))
+function incrementar(id) {
+  const juegoEnCarrito = carrito.find((juego) => juego.id === id);
+  juegoEnCarrito.cantidad++;
+  localStorage.setItem("carrito", JSON.stringify(carrito));
   Toastify({
     text: `Sumaste otro ${juegoEnCarrito.nombre}!`,
     duration: 1000,
     gravity: "top",
     position: "center",
-    style:{background: "rgb(21, 115, 71)"}
-  }).showToast()
-  mostrarCarrito()
+    style: { background: "rgb(21, 115, 71)" },
+  }).showToast();
+  mostrarCarrito();
 }
 
-//Decrementar en carrito
+//DECREMENTAR CANTIDAD DE PRODUCTO EN CARRITO
 
-function decrementar(id){
-  const juegoEnCarrito = carrito.find((juego) => juego.id === id)
-  if(juegoEnCarrito.cantidad > 1){
-  juegoEnCarrito.cantidad--
-  localStorage.setItem("carrito", JSON.stringify(carrito))
-  Toastify({
-    text: `Quitaste un ${juegoEnCarrito.nombre}!`,
-    duration: 1000,
-    gravity: "top",
-    position: "center",
-    style:{background: "rgb(198, 46, 46)"}
-  }).showToast()
-  mostrarCarrito()}
+function decrementar(id) {
+  const juegoEnCarrito = carrito.find((juego) => juego.id === id);
+  if (juegoEnCarrito.cantidad > 1) {
+    juegoEnCarrito.cantidad--;
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+    Toastify({
+      text: `Quitaste un ${juegoEnCarrito.nombre}!`,
+      duration: 1000,
+      gravity: "top",
+      position: "center",
+      style: { background: "rgb(198, 46, 46)" },
+    }).showToast();
+    mostrarCarrito();
+  }
 }
 
+//TOTAL DE LA COMPRA
 
-  //MOSTRAMOS MENSAJE CON EL TOTAL DE LA COMPRA
-
-
-
-function calcularTotal(){
+function calcularTotal() {
   let totalCompra = 0;
-  carrito.forEach((juego)=>{
-    totalCompra += juego.precio * juego.cantidad
-  })
+  carrito.forEach((juego) => {
+    totalCompra += juego.precio * juego.cantidad;
+  });
   total.innerHTML = `
-  Total: $${totalCompra} `
+  Total: $${totalCompra} `;
 }
-
-
-  
 
 //FUNCIÓN QUE ELIMINA EL PRODUCTO DEL CARRITO
-function eliminarDelCarrito(id){
-  const juego = carrito.find((juego) => juego.id === id)
-  const indice = carrito.indexOf(juego)
-  carrito.splice(indice, 1)
-  juego.cantidad = 1
-  mostrarCarrito()
-  localStorage.setItem("carrito", JSON.stringify(carrito))
-  contadorCarrito.innerText = carrito.length
-  Swal.fire(
-    '',
-    `${juego.nombre} eliminado`,
-    'success'
-    )
-  }
-  
-  //VACIAMOS TODO EL CARRITO
-  
-  
-  
-  function limpiarCarrito (){
-    if(carrito.length < 1){
-      Swal.fire({
-        title: 'No hay productos en el carrito!',
-        icon: 'info',
-      })
-    } else {
+function eliminarDelCarrito(id) {
+  const juego = carrito.find((juego) => juego.id === id);
+  const indice = carrito.indexOf(juego);
+  carrito.splice(indice, 1);
+  juego.cantidad = 1;
+  mostrarCarrito();
+  localStorage.setItem("carrito", JSON.stringify(carrito));
+  contadorCarrito.innerText = carrito.length;
+  Swal.fire("", `${juego.nombre} eliminado`, "success");
+}
+
+//VACIAR EL CARRITO
+
+function limpiarCarrito() {
+  if (carrito.length < 1) {
     Swal.fire({
-      title: 'Seguro que queres vaciar el carrito?',
-      icon: 'warning',
+      title: "No hay productos en el carrito!",
+      icon: "info",
+    });
+  } else {
+    Swal.fire({
+      title: "Seguro que queres vaciar el carrito?",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, vaciar!'
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, vaciar!",
     }).then((result) => {
       if (result.isConfirmed) {
-        Swal.fire(
-          'Carrito vaciado!',
-          '',
-          'success'
-          )
-          carrito.forEach((juego) =>{
-            juego.cantidad = 1
-          })
-          carrito = []
-          mostrarCarrito()
-          localStorage.clear()
-          contadorCarrito.innerText = carrito.length
-        }
-      })}}
-      
-    
-//Finalizar compra
+        Swal.fire("Carrito vaciado!", "", "success");
+        carrito.forEach((juego) => {
+          juego.cantidad = 1;
+        });
+        carrito = [];
+        mostrarCarrito();
+        localStorage.clear();
+        contadorCarrito.innerText = carrito.length;
+      }
+    });
+  }
+}
 
-      function finalizarCompraa (){
-        if(carrito.length < 1){
-          Swal.fire({
-            title: 'No hay productos en el carrito!',
-            icon: 'info',
-          })
-        } else {
-        Swal.fire({
-          title: 'Seguro que queres finalizar la compra?',
-          icon: 'info',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Sí, comprar!'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            Swal.fire(
-              'Pedido realizado! Que lo disfrutes!',
-              '',
-              'success'
-              )
-              carrito.forEach((juego) =>{
-                juego.cantidad = 1
-              })
-              carrito = []
-              mostrarCarrito()
-              localStorage.clear()
-              contadorCarrito.innerText = carrito.length
-            }
-          })
-      }}
+//FINALIZAR COMPRA
+
+function finalizarCompraa() {
+  if (carrito.length < 1) {
+    Swal.fire({
+      title: "No hay productos en el carrito!",
+      icon: "info",
+    });
+  } else {
+    Swal.fire({
+      title: "Seguro que queres finalizar la compra?",
+      icon: "info",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, comprar!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire("Pedido realizado! Que lo disfrutes!", "", "success");
+        carrito.forEach((juego) => {
+          juego.cantidad = 1;
+        });
+        carrito = [];
+        mostrarCarrito();
+        localStorage.clear();
+        contadorCarrito.innerText = carrito.length;
+      }
+    });
+  }
+}
